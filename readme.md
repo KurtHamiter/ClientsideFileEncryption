@@ -1,0 +1,1 @@
+Web app used to encrypt files with a password before uploading and storing on a server. Server sees neither password nor raw file, therefore it's impossible for the host to determine the contents of the file that the user has uploaded.
