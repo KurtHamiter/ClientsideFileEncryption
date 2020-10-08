@@ -1,0 +1,298 @@
+<html>
+
+<head>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+	<link rel="stylesheet" type="text/css" href="encrypt.css">
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+	<script src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/sha256.js"></script>
+
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	
+	<meta content="utf-8" http-equiv="encoding">
+
+</head>
+
+
+	<body>
+	
+		<div id="container">
+	
+			<div id="fileupload">
+		
+				<input id="image-file" onchange="updateFile();" type="file"/>
+				
+				<div id="fileuploadtext">
+				
+					Upload File
+				
+				</div>
+		
+			</div>
+		
+			<div id="linebreak">
+		
+			</div>
+		
+			<input type="text" id="enterPassword" placeholder="Encryption Password">
+			
+			<div id="linebreak">
+			
+			</div>
+			
+			<div id="enterStrengthBefore">
+			
+				<div id="enterStrengthBeforeText">
+				
+					Bruteforce Protection
+				
+				</div>
+				
+				<div id="enterStrengthBeforeText2">
+				
+					Determines mathematical complexity of encryption/decryption process. More iterations means more security, with the exception of slower load times.
+				
+				</div>
+			
+			<div id="enterStrength">
+			
+				<div id="enterStrengthButton" name="strength1" onclick="strength(1);">
+				
+					Basic
+				
+				</div>
+				
+				<div id="enterStrengthButton" name="strength2" onclick="strength(2);">
+				
+					Medium
+				
+				</div>
+				
+				<div id="enterStrengthButton" name="strength3" onclick="strength(3);">
+				
+					Maximum
+				
+				</div>
+			
+			</div>
+			
+			<div id="enterStrengthTextAfter1">
+			
+				Estimated encryption/decryption time: 
+			
+			</div>
+			
+			<div id="enterStrengthTextAfter2">
+			
+			</div>
+			
+			</div>
+
+			
+			<div id="linebreak">
+			
+			</div>
+		
+			<button type="submit" id="buttonSubmit" onclick="uploadButton();">
+		
+				Upload
+		
+			</button>
+			
+		</div>
+		
+		<div id="overlay">
+		
+			<div id="overlayContainer">
+				
+				<div id="overlayContainerContainer">
+					
+					<div id="overlayContainerContainerText">
+					
+						File Upload Successful
+					
+					</div>
+					
+					<div id="overlayContainerContainerText2">
+					
+					</div>
+				
+				</div>
+			
+			</div>
+		
+		</div>
+
+	</body>
+	
+	<script>
+	
+	var fileNameUpload;
+	
+	function updateFile() {
+		
+		fileNameUpload = document.getElementById('image-file').value.split('\\');
+		fileNameUploadCount = ((fileNameUpload.length) - 1);
+		fileNameUpload = fileNameUpload[fileNameUploadCount];
+		fileNameUpload = fileNameUpload.split('.');
+		
+		if (fileNameUpload[0] != "") {
+		
+			$('#fileuploadtext').text(fileNameUpload[0]+"."+fileNameUpload[1]);
+			$('#fileupload').css("backgroundColor", "#d6f5f5");
+			$('#fileupload').css("border", "1px dotted #666666");
+		
+		}
+		
+	}
+	
+	$("[name='strength1']").css({"border":"2px solid #4d4d4d"});
+	$('#enterStrengthTextAfter2').text('~ 5 Seconds');
+	
+	var encryptionStrength = 10000;
+	
+	function strength(value) {
+		
+		console.log(value);
+		
+		switch(value) {
+				
+			case 1:
+			
+			$("[name='strength1']").css({"border":"2px solid #4d4d4d"});
+			$("[name='strength2']").css({"border":"none"});
+			$("[name='strength3']").css({"border":"none"});
+			$('#enterStrengthTextAfter2').text('~ 5 Seconds');
+			
+			encryptionStrength = 10000;
+			
+    
+			break;
+			case 2:
+			
+			$("[name='strength1']").css({"border":"none"});
+			$("[name='strength2']").css({"border":"2px solid #4d4d4d"});
+			$("[name='strength3']").css({"border":"none"});
+			$('#enterStrengthTextAfter2').text('~ 10 Seconds');
+			
+			encryptionStrength = 20000;
+   
+			break;
+			
+			case 3:
+			
+			$("[name='strength1']").css({"border":"none"});
+			$("[name='strength2']").css({"border":"none"});
+			$("[name='strength3']").css({"border":"2px solid #4d4d4d"});
+			$('#enterStrengthTextAfter2').text('~ 15 Seconds');
+			
+			encryptionStrength = 30000;
+			
+			break;
+			
+			default:
+			
+    
+	}
+		
+	}
+	
+	// Start encryption function
+	let code = (function(){
+		return {
+			encryptMessage: function(messageToencrypt = '', secretkey = ''){
+			var encryptedMessage = CryptoJS.AES.encrypt(messageToencrypt, secretkey);
+			return encryptedMessage.toString();
+			}
+		}
+	})();
+
+	// End encryption function
+
+	
+	// Press upload button
+
+	function uploadButton() {
+		
+		if (!$('#image-file').val()) {
+			$('#fileupload').css("border", "1px solid red");
+		} else {
+			
+			if ($('#enterPassword').val().length == 0) {
+				
+				$('#enterPassword').css("border", "1px solid red");
+				
+			} else {
+	
+				rawBase64 = document.querySelector('#image-file').files[0];
+				getBase64(rawBase64);
+			
+			}
+		
+		}
+
+	}
+
+	// Grab file and get base64 of contents, encrypt, send to server for upload
+	
+	function getBase64(file) {
+		
+		var encryptionPass = document.getElementById('enterPassword').value;
+		
+		console.log(encryptionPass);
+		
+		var reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function () {
+			words = reader.result.split(',');
+
+			// Start POST constructor
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://localhost:8080/encryption/upload.php', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function () {
+
+			};
+			// End POST constructor
+	
+			for (i = 0; i <= encryptionStrength; i++) {
+	
+				encryptionPass = CryptoJS.SHA256(encryptionPass).toString();
+	
+				console.log(i);
+			
+				console.log(encryptionPass);
+	
+			}
+			
+			encryptedSend = code.encryptMessage(words[1],encryptionPass);
+			xhr.send(`base64=${encodeURIComponent(encryptedSend)}&filename=${fileNameUpload[0]}&fileex=${fileNameUpload[1]}&security=${encryptionStrength}`);
+			console.log("XHR Send");
+			console.log(CryptoJS.MD5(encryptedSend).toString());
+			
+			document.getElementById("overlay").style.display = "flex";
+			
+			var a = document.createElement('a');
+			var linkText = document.createTextNode(fileNameUpload[0]+"."+fileNameUpload[1]);
+			a.appendChild(linkText);
+			a.href = "/encryption/getfile.php?md5="+CryptoJS.MD5(encryptedSend).toString();
+			document.getElementById("overlayContainerContainerText2").appendChild(a); 
+			
+		};
+		reader.onerror = function (error) {
+		console.log('Error: ', error);
+		};
+		
+	}
+	
+
+
+		</script>
+
+</html>
